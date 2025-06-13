@@ -15,5 +15,12 @@ public interface LocationClients {
 
     @GetMapping("/api/location/active/car/{idVoiture}")
     Iterable<Location> getActiveLocationByVoiture(@PathVariable("idVoiture") Long idVoiture);
+
+    @PutMapping("/api/location/{id}/update")
+    Location updateLocation(@PathVariable long id);
+
+    @GetMapping("/api/location/{id}")
+    Location getLocation(@PathVariable("id") Long id);
+
 }
 

@@ -2,7 +2,7 @@ package fr.miage.lroux.compositelocation.dto;
 
 public class AccessCard {
 
-    private long accessCardid;
+    private long accessCardId;
 
     private String password;
 
@@ -17,7 +17,7 @@ public class AccessCard {
     }
 
     public void setAccessCardid(long accessCardid) {
-        this.accessCardid = accessCardid;
+        this.accessCardId = accessCardid;
     }
 
     public void setPassword(String password) {
@@ -25,7 +25,7 @@ public class AccessCard {
     }
 
     public long getAccessCardid() {
-        return accessCardid;
+        return accessCardId;
     }
 
     public String getPassword() {
@@ -36,7 +36,7 @@ public class AccessCard {
     }
 
     public AccessCard(long accessCardid, String password, long userId) {
-        this.accessCardid = accessCardid;
+        this.accessCardId = accessCardid;
         this.password = password;
         this.userId = userId;
     }
