@@ -18,5 +18,8 @@ public interface StationClients {
     Station getStation(@PathVariable long stationId);
 
     @RequestMapping(method = RequestMethod.PUT, value = "/api/station/retrieve/{stationId}",produces = "application/json")
-    List<Station> updateAfterRetrievingCar(@PathVariable long stationId);
+    Station updateAfterRetrievingCar(@PathVariable long stationId);
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/api/station/add/{stationId}", produces = "application/json")
+    Station updateStationAddCar(@PathVariable Long stationId);
 }

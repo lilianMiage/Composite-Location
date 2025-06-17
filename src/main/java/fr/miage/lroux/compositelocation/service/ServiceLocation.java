@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Component
@@ -26,14 +25,18 @@ public class ServiceLocation implements RepoLocation {
 
     private final StationClients stationClients;
 
+    private final StatistiqueClients statistiqueClients;
 
-    public ServiceLocation(AccessCardClients accessCardClients, LocationClients locationClients, CarClients carClients, UserClients userClients, StationClients stationClients) {
+
+    public ServiceLocation(AccessCardClients accessCardClients, LocationClients locationClients, CarClients carClients, UserClients userClients, StationClients stationClients, StatistiqueClients statistiqueClients) {
         this.accessCardClients = accessCardClients;
         this.locationClients = locationClients;
         this.carClients = carClients;
         this.userClients = userClients;
         this.stationClients = stationClients;
+        this.statistiqueClients = statistiqueClients;
     }
+
 
     public UserWithCar createLocation(long userId, Car carId) throws Exception {
 
@@ -50,7 +53,8 @@ public class ServiceLocation implements RepoLocation {
             throw new Exception("The car or the user are alrealdy active");
         }
 
-        stationClients.updateAfterRetrievingCar(carLoue.getStationId());
+        Station stationAfterUpdate =stationClients.updateAfterRetrievingCar(carLoue.getStationId());
+        statistiqueClients.postStationHistorisation(stationAfterUpdate);
 
         Location location = new Location();
 
@@ -61,7 +65,11 @@ public class ServiceLocation implements RepoLocation {
         location.setStationId(carLoue.getStationId());
         location.setUserId(userId);
         locationClients.createLocation(location);
-        carClients.putCar(carLoue.getCarId());
+        statistiqueClients.postLocationHistorisation(location);
+
+        Car carAfterUpdate = carClients.putCar(carLoue.getCarId());
+        statistiqueClients.postCarHistorisation(carAfterUpdate);
+
         return new UserWithCar(user,carLoue);
     }
 
@@ -83,19 +91,22 @@ public class ServiceLocation implements RepoLocation {
         }
 
         // Mise à jour de la voiture
-        Car updatedCar = updateCarAfterReturn(car, request);
+        Car carAfterUpdate = updateCarAfterReturn(car, request);
+        statistiqueClients.postCarHistorisation(carAfterUpdate);
 
-        deactivateLocation(request.getLocationId());
+        // Mise à jour de la location
+        Location locationAfterUpdate =deactivateLocation(request.getLocationId());
+        statistiqueClients.postLocationHistorisation(
+                new LocationWithDistance(locationAfterUpdate, request.getDistanceTravelled()));
 
-        return updatedCar;
+        // Mise à jour de la station
+        Station stationAfterUpdate =stationClients.updateStationAddCar(station.getStationId());
+        statistiqueClients.postStationHistorisation(stationAfterUpdate);
+
+        return carAfterUpdate;
     }
 
     @Override
-    public List<StationWithTime> getThreeClosestStations(Long carId) throws Exception {
-        return null;
-    }
-
-    /**
     public List<StationWithTime> getThreeClosestStations(Long carId) throws Exception {
         Car car = carClients.getCar(carId);
         List<Double> carLocation = car.getLocalisation();
@@ -119,20 +130,18 @@ public class ServiceLocation implements RepoLocation {
         result.add(new StationWithTime(nearestStations.get(2), time3));
 
         return result;
-    }*/
+    }
 
 
-    private void deactivateLocation(long locationId) throws Exception {
+    private Location deactivateLocation(long locationId) throws Exception {
         Location location;
         try {
             location = locationClients.getLocation(locationId);
         } catch (FeignException.NotFound e) {
             throw new Exception("Erreur récupération location " + locationId);
         }
-
-        location.setActive(false);
         try {
-            locationClients.updateLocation(location.getIdLocation());
+            return locationClients.updateLocation(location.getIdLocation());
         } catch (FeignException.NotFound e) {
             throw new Exception("Erreur mise à jour location " + location.getIdLocation());
         }
@@ -201,6 +210,7 @@ public class ServiceLocation implements RepoLocation {
             throw new Exception("Station " + stationId + " introuvable");
         }
     }
+
 
     private double haversine(List<Double> loc1, List<Double> loc2) {
         final int R = 6371;

@@ -11,4 +11,6 @@ public interface RepoLocation {
     Object returnCar(ReturnCarRequest request) throws Exception;
 
     List<StationWithTime> getThreeClosestStations(Long carId) throws Exception;
+
+    //void transfertVehicules(double seuilSurcharge, double seuilSousOccupation) throws Exception;
 }
