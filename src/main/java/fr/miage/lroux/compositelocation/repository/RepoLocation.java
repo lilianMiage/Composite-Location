@@ -12,5 +12,5 @@ public interface RepoLocation {
 
     List<StationWithTime> getThreeClosestStations(Long carId) throws Exception;
 
-    //void transfertVehicules(double seuilSurcharge, double seuilSousOccupation) throws Exception;
+    void technicien(double seuil);
 }

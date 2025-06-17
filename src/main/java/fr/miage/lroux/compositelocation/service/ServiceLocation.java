@@ -38,6 +38,20 @@ public class ServiceLocation implements RepoLocation {
     }
 
 
+    public void technicien(double seuil){
+        List<StationOccupation> stationsMoinsOccupees = statistiqueClients.getStationsMoinsOccupees(seuil);
+        List<StationOccupation> stationsSurchargees = statistiqueClients.getStationsSurchargees(seuil);
+
+        for (StationOccupation station : stationsMoinsOccupees) {
+            System.out.println("Station moins occupée : " + station.getStationId() + " avec un taux d'occupation de " + station.getOccupationRate());
+        }
+
+        for (StationOccupation station : stationsSurchargees) {
+            System.out.println("Station surchargée : " + station.getStationId() + " avec un taux d'occupation de " + station.getOccupationRate());
+        }
+
+    }
+
     public UserWithCar createLocation(long userId, Car carId) throws Exception {
 
         // Check User
@@ -65,7 +79,7 @@ public class ServiceLocation implements RepoLocation {
         location.setStationId(carLoue.getStationId());
         location.setUserId(userId);
         locationClients.createLocation(location);
-        statistiqueClients.postLocationHistorisation(location);
+        statistiqueClients.postLocationHistorisation(new LocationWithDistance(location,0.0));
 
         Car carAfterUpdate = carClients.putCar(carLoue.getCarId());
         statistiqueClients.postCarHistorisation(carAfterUpdate);

@@ -30,4 +30,9 @@ public class ControllerLocation {
         return repoLocation.getThreeClosestStations(carId);
     }
 
+    @GetMapping("technicien")
+    public void getStationsSurchargees(@RequestParam double seuil) {
+        repoLocation.technicien(seuil);
+    }
+
 }

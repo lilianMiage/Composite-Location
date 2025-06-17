@@ -1,9 +1,6 @@
 package fr.miage.lroux.compositelocation.clients;
 
-import fr.miage.lroux.compositelocation.dto.Car;
-import fr.miage.lroux.compositelocation.dto.Location;
-import fr.miage.lroux.compositelocation.dto.Station;
-import fr.miage.lroux.compositelocation.dto.StationOccupation;
+import fr.miage.lroux.compositelocation.dto.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +12,7 @@ public interface StatistiqueClients {
     @RequestMapping(method = RequestMethod.GET, value = "/api/statistique/station/mostused/{seuil}", produces = "application/json")
     List<StationOccupation> getStationsSurchargees(@PathVariable("seuil") double seuil);
 
-    @RequestMapping(method = RequestMethod.GET, value = "/api/statistique/station/leastused/{seuil}", produces = "application/json")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/statistique/station/lessused/{seuil}", produces = "application/json")
     List<StationOccupation> getStationsMoinsOccupees(@PathVariable("seuil") double seuil);
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/snapshots/car/", produces = "application/json")
@@ -25,6 +22,6 @@ public interface StatistiqueClients {
     Station postStationHistorisation(@RequestBody Station station);
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/snapshots/location/", produces = "application/json")
-    Location postLocationHistorisation(@RequestBody Location location);
+    Location postLocationHistorisation(@RequestBody LocationWithDistance location);
 
 }
